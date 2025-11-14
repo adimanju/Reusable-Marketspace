@@ -1,0 +1,1701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reusable Marketspace - Recycle Vendor Platform</title>
+    <style>
+        :root {
+            --color-primary: #2563eb;
+            --color-primary-hover: #1d4ed8;
+            --color-success: #10b981;
+            --color-danger: #ef4444;
+            --color-background: #f8fafc;
+            --color-surface: #ffffff;
+            --color-text: #1e293b;
+            --color-text-secondary: #64748b;
+            --color-border: #e2e8f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--color-background);
+            color: var(--color-text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Navigation */
+        nav {
+            background: var(--color-surface);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--color-primary);
+        }
+
+        .nav-links button {
+            background: transparent;
+            border: none;
+            margin-left: 1rem;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            font-size: 0.95rem;
+            color: var(--color-text);
+            transition: all 0.3s;
+        }
+
+        .nav-links button:hover {
+            color: var(--color-primary);
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: white;
+            border-radius: 6px;
+        }
+
+        .btn-primary:hover {
+            background: var(--color-primary-hover);
+        }
+
+        /* Auth Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--color-surface);
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 450px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h2 {
+            font-size: 1.5rem;
+            color: var(--color-text);
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--color-text-secondary);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--color-text);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            font-size: 0.95rem;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: 2px solid var(--color-primary);
+            border-color: var(--color-primary);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            font-weight: 500;
+        }
+
+        .btn-block {
+            background: var(--color-primary);
+            color: white;
+        }
+
+        .btn-block:hover {
+            background: var(--color-primary-hover);
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: var(--color-text);
+            margin-top: 0.5rem;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .role-selector {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .role-btn {
+            flex: 1;
+            padding: 0.75rem;
+            border: 2px solid var(--color-border);
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .role-btn.active {
+            border-color: var(--color-primary);
+            background: #eff6ff;
+            color: var(--color-primary);
+        }
+
+        /* Dashboard */
+        .dashboard {
+            display: none;
+        }
+
+        .dashboard.active {
+            display: block;
+        }
+
+        .dashboard-header {
+            background: var(--color-surface);
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .dashboard-header h1 {
+            margin-bottom: 0.5rem;
+        }
+
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--color-surface);
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .stat-card h3 {
+            font-size: 2rem;
+            color: var(--color-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card p {
+            color: var(--color-text-secondary);
+        }
+
+        /* Product Grid */
+        .products-section {
+            background: var(--color-surface);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .products-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-filter {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-filter input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+        }
+
+        .search-filter select {
+            padding: 0.75rem;
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .product-card {
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .product-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+        }
+
+        .product-info {
+            padding: 1rem;
+        }
+
+        .product-info h3 {
+            margin-bottom: 0.5rem;
+            color: var(--color-text);
+        }
+
+        .product-price {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--color-primary);
+            margin: 0.5rem 0;
+        }
+
+        .product-quantity {
+            color: var(--color-text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-vendor {
+            color: var(--color-text-secondary);
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-add-cart {
+            flex: 1;
+            padding: 0.5rem;
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-add-cart:hover {
+            background: var(--color-primary-hover);
+        }
+
+        /* Cart */
+        .cart-badge {
+            position: relative;
+        }
+
+        .cart-badge::after {
+            content: attr(data-count);
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--color-danger);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+        }
+
+        .cart-items {
+            margin-top: 1rem;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            background: white;
+        }
+
+        .cart-item-info h4 {
+            margin-bottom: 0.25rem;
+        }
+
+        .cart-item-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .quantity-control button {
+            width: 30px;
+            height: 30px;
+            border: 1px solid var(--color-border);
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .cart-summary {
+            background: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        .cart-summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .cart-summary-row.total {
+            font-size: 1.25rem;
+            font-weight: bold;
+            border-top: 2px solid var(--color-border);
+            padding-top: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Admin Panel */
+        .admin-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .admin-action-card {
+            background: var(--color-surface);
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .admin-action-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .admin-action-card h3 {
+            color: var(--color-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .users-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        .users-table th,
+        .users-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .users-table th {
+            background: #f8fafc;
+            font-weight: 600;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .status-approved {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-rejected {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
+        }
+
+        .payment-gateway {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .payment-methods {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .payment-method {
+            border: 2px solid var(--color-border);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .payment-method.selected {
+            border-color: var(--color-primary);
+            background: #eff6ff;
+        }
+
+        .kyc-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .kyc-verified {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .kyc-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        @media (max-width: 768px) {
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .search-filter {
+                flex-direction: column;
+            }
+
+            .dashboard-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav id="mainNav">
+        <div class="container">
+            <div class="logo">♻️ Reusable Marketspace</div>
+            <div class="nav-links">
+                <button onclick="showHome()">Home</button>
+                <button onclick="openAuthModal('login')">Login</button>
+                <button onclick="openAuthModal('register')" class="btn-primary">Register</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Home/Landing Section -->
+        <div id="homeSection" class="dashboard active">
+            <div class="dashboard-header">
+                <h1>Welcome to Reusable Marketspace</h1>
+                <p>India's Premier Platform for Bulk Recycled Electronic Components</p>
+            </div>
+
+            <div class="alert alert-info">
+                🎯 <strong>For Vendors:</strong> Register and complete e-KYC verification to start selling SD cards, embedded systems, and electronic components in bulk quantities.
+            </div>
+
+            <div class="products-section">
+                <div class="products-header">
+                    <h2>Featured Products</h2>
+                </div>
+                <div class="search-filter">
+                    <input type="text" id="searchInput" placeholder="Search products..." oninput="filterProducts()">
+                    <select id="categoryFilter" onchange="filterProducts()">
+                        <option value="all">All Categories</option>
+                        <option value="sd-cards">SD Cards</option>
+                        <option value="embedded">Embedded Systems</option>
+                        <option value="sensors">Sensors</option>
+                        <option value="components">Electronic Components</option>
+                    </select>
+                </div>
+                <div id="productsGrid" class="products-grid"></div>
+            </div>
+        </div>
+
+        <!-- Customer Dashboard -->
+        <div id="customerDashboard" class="dashboard">
+            <div class="dashboard-header">
+                <h1>Customer Dashboard</h1>
+                <p id="customerWelcome"></p>
+            </div>
+
+            <div class="products-section">
+                <div class="products-header">
+                    <h2>Browse Products</h2>
+                    <button onclick="showCart()" class="btn-primary cart-badge" data-count="0" id="cartButton">
+                        🛒 Cart
+                    </button>
+                </div>
+                <div class="search-filter">
+                    <input type="text" id="customerSearchInput" placeholder="Search products..." oninput="filterProducts()">
+                    <select id="customerCategoryFilter" onchange="filterProducts()">
+                        <option value="all">All Categories</option>
+                        <option value="sd-cards">SD Cards</option>
+                        <option value="embedded">Embedded Systems</option>
+                        <option value="sensors">Sensors</option>
+                        <option value="components">Electronic Components</option>
+                    </select>
+                </div>
+                <div id="customerProductsGrid" class="products-grid"></div>
+            </div>
+        </div>
+
+        <!-- Vendor Dashboard -->
+        <div id="vendorDashboard" class="dashboard">
+            <div class="dashboard-header">
+                <h1>Vendor Dashboard</h1>
+                <p id="vendorWelcome"></p>
+                <div id="vendorKycStatus"></div>
+            </div>
+
+            <div class="dashboard-stats">
+                <div class="stat-card">
+                    <h3 id="vendorProductCount">0</h3>
+                    <p>Total Products</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="vendorOrderCount">0</h3>
+                    <p>Total Orders</p>
+                </div>
+                <div class="stat-card">
+                    <h3>₹<span id="vendorRevenue">0</span></h3>
+                    <p>Total Revenue</p>
+                </div>
+            </div>
+
+            <div class="products-section">
+                <div class="products-header">
+                    <h2>My Products</h2>
+                    <button onclick="openAddProductModal()" class="btn-primary">+ Add Product</button>
+                </div>
+                <div id="vendorProductsGrid" class="products-grid"></div>
+            </div>
+        </div>
+
+        <!-- Admin Dashboard -->
+        <div id="adminDashboard" class="dashboard">
+            <div class="dashboard-header">
+                <h1>Admin Dashboard</h1>
+                <p>Complete Platform Management</p>
+            </div>
+
+            <div class="dashboard-stats">
+                <div class="stat-card">
+                    <h3 id="adminVendorCount">0</h3>
+                    <p>Total Vendors</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="adminCustomerCount">0</h3>
+                    <p>Total Customers</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="adminProductCount">0</h3>
+                    <p>Total Products</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="adminOrderCount">0</h3>
+                    <p>Total Orders</p>
+                </div>
+            </div>
+
+            <div class="admin-actions">
+                <div class="admin-action-card" onclick="showAdminSection('vendors')">
+                    <h3>👥 Manage Vendors</h3>
+                    <p>Approve KYC & manage vendors</p>
+                </div>
+                <div class="admin-action-card" onclick="showAdminSection('customers')">
+                    <h3>🛍️ Manage Customers</h3>
+                    <p>View and manage customers</p>
+                </div>
+                <div class="admin-action-card" onclick="showAdminSection('products')">
+                    <h3>📦 Manage Products</h3>
+                    <p>Review and manage all products</p>
+                </div>
+                <div class="admin-action-card" onclick="showAdminSection('orders')">
+                    <h3>📊 View Orders</h3>
+                    <p>Track all platform orders</p>
+                </div>
+            </div>
+
+            <div id="adminContentSection" class="products-section"></div>
+        </div>
+
+        <!-- Cart Section -->
+        <div id="cartSection" class="dashboard">
+            <div class="dashboard-header">
+                <h1>Shopping Cart</h1>
+                <button onclick="backToShopping()" class="btn-secondary">← Continue Shopping</button>
+            </div>
+
+            <div id="cartItems" class="cart-items"></div>
+            
+            <div class="cart-summary">
+                <div class="cart-summary-row">
+                    <span>Subtotal:</span>
+                    <span id="cartSubtotal">₹0</span>
+                </div>
+                <div class="cart-summary-row">
+                    <span>Tax (18% GST):</span>
+                    <span id="cartTax">₹0</span>
+                </div>
+                <div class="cart-summary-row total">
+                    <span>Total:</span>
+                    <span id="cartTotal">₹0</span>
+                </div>
+                <button onclick="proceedToCheckout()" class="btn btn-block">Proceed to Checkout</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auth Modal -->
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Login</h2>
+                <button class="close-modal" onclick="closeAuthModal()">×</button>
+            </div>
+
+            <!-- Login Form -->
+            <div id="loginForm">
+                <div class="role-selector">
+                    <button class="role-btn active" data-role="customer" onclick="selectRole('customer')">Customer</button>
+                    <button class="role-btn" data-role="vendor" onclick="selectRole('vendor')">Vendor</button>
+                    <button class="role-btn" data-role="admin" onclick="selectRole('admin')">Admin</button>
+                </div>
+
+                <form onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label for="loginPhone">Phone Number / Email</label>
+                        <input type="text" id="loginPhone" required placeholder="Enter phone or email">
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" required placeholder="Enter password">
+                    </div>
+                    <button type="submit" class="btn btn-block">Login</button>
+                    <button type="button" class="btn btn-secondary" onclick="switchToRegister()">Create Account</button>
+                </form>
+            </div>
+
+            <!-- Register Form -->
+            <div id="registerForm" style="display: none;">
+                <div class="role-selector">
+                    <button class="role-btn active" data-role="customer" onclick="selectRegisterRole('customer')">Customer</button>
+                    <button class="role-btn" data-role="vendor" onclick="selectRegisterRole('vendor')">Vendor</button>
+                </div>
+
+                <form onsubmit="handleRegister(event)">
+                    <div class="form-group">
+                        <label for="regName">Full Name *</label>
+                        <input type="text" id="regName" required placeholder="Enter full name">
+                    </div>
+                    <div class="form-group">
+                        <label for="regPhone">Phone Number *</label>
+                        <input type="tel" id="regPhone" required placeholder="10-digit mobile number">
+                    </div>
+                    <div class="form-group">
+                        <label for="regEmail">Email *</label>
+                        <input type="email" id="regEmail" required placeholder="your@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="regPassword">Password *</label>
+                        <input type="password" id="regPassword" required placeholder="Minimum 6 characters">
+                    </div>
+
+                    <!-- Vendor-specific fields -->
+                    <div id="vendorFields" style="display: none;">
+                        <div class="form-group">
+                            <label for="businessName">Business Name *</label>
+                            <input type="text" id="businessName" placeholder="Your company name">
+                        </div>
+                        <div class="form-group">
+                            <label for="gstNumber">GST Number</label>
+                            <input type="text" id="gstNumber" placeholder="GST registration number">
+                        </div>
+                        <div class="form-group">
+                            <label for="businessAddress">Business Address *</label>
+                            <textarea id="businessAddress" rows="3" placeholder="Complete business address"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="aadhaarNumber">Aadhaar Number (for e-KYC) *</label>
+                            <input type="text" id="aadhaarNumber" placeholder="12-digit Aadhaar number" maxlength="12">
+                        </div>
+                        <div class="alert alert-info">
+                            📱 After registration, you'll receive an OTP on your Aadhaar-linked mobile for DigiLocker verification
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-block">Register</button>
+                    <button type="button" class="btn btn-secondary" onclick="switchToLogin()">Already have account?</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Product Modal -->
+    <div id="addProductModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Product</h2>
+                <button class="close-modal" onclick="closeAddProductModal()">×</button>
+            </div>
+
+            <form onsubmit="handleAddProduct(event)">
+                <div class="form-group">
+                    <label for="productName">Product Name *</label>
+                    <input type="text" id="productName" required placeholder="e.g., 32GB SD Card Class 10">
+                </div>
+                <div class="form-group">
+                    <label for="productCategory">Category *</label>
+                    <select id="productCategory" required>
+                        <option value="">Select category</option>
+                        <option value="sd-cards">SD Cards</option>
+                        <option value="embedded">Embedded Systems</option>
+                        <option value="sensors">Sensors</option>
+                        <option value="components">Electronic Components</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="productPrice">Price per Unit (₹) *</label>
+                    <input type="number" id="productPrice" required min="1" placeholder="Enter price">
+                </div>
+                <div class="form-group">
+                    <label for="productQuantity">Available Quantity *</label>
+                    <input type="number" id="productQuantity" required min="10" placeholder="Minimum 10 units">
+                </div>
+                <div class="form-group">
+                    <label for="productDescription">Description *</label>
+                    <textarea id="productDescription" rows="4" required placeholder="Detailed product description, specifications, condition..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-block">Add Product</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div id="paymentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Complete Payment</h2>
+                <button class="close-modal" onclick="closePaymentModal()">×</button>
+            </div>
+
+            <div class="payment-gateway">
+                <h3>Order Summary</h3>
+                <div class="cart-summary">
+                    <div class="cart-summary-row">
+                        <span>Subtotal:</span>
+                        <span id="paymentSubtotal">₹0</span>
+                    </div>
+                    <div class="cart-summary-row">
+                        <span>GST (18%):</span>
+                        <span id="paymentTax">₹0</span>
+                    </div>
+                    <div class="cart-summary-row total">
+                        <span>Total Amount:</span>
+                        <span id="paymentTotal">₹0</span>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 1.5rem;">Select Payment Method</h3>
+                <div class="payment-methods">
+                    <div class="payment-method selected" onclick="selectPaymentMethod(this)">
+                        <div>💳</div>
+                        <div>Credit/Debit Card</div>
+                    </div>
+                    <div class="payment-method" onclick="selectPaymentMethod(this)">
+                        <div>🏦</div>
+                        <div>Net Banking</div>
+                    </div>
+                    <div class="payment-method" onclick="selectPaymentMethod(this)">
+                        <div>📱</div>
+                        <div>UPI</div>
+                    </div>
+                    <div class="payment-method" onclick="selectPaymentMethod(this)">
+                        <div>👛</div>
+                        <div>Wallet</div>
+                    </div>
+                </div>
+
+                <div class="alert alert-info" style="margin-top: 1rem;">
+                    🔒 Secured by Razorpay Payment Gateway - All transactions are encrypted and secure
+                </div>
+
+                <button onclick="processPayment()" class="btn btn-block" style="margin-top: 1rem;">Pay Now</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // App State
+        let currentUser = null;
+        let selectedLoginRole = 'customer';
+        let selectedRegisterRole = 'customer';
+        let cart = [];
+        let products = [
+            {
+                id: 1,
+                name: '32GB SD Card Class 10',
+                category: 'sd-cards',
+                price: 180,
+                quantity: 500,
+                vendor: 'TechRecycle Pvt Ltd',
+                description: 'High-quality refurbished SD cards, tested and verified'
+            },
+            {
+                id: 2,
+                name: 'Arduino Uno R3 Board',
+                category: 'embedded',
+                price: 450,
+                quantity: 200,
+                vendor: 'ElectroReuse Solutions',
+                description: 'Fully functional Arduino boards, recycled from educational institutions'
+            },
+            {
+                id: 3,
+                name: 'DHT22 Temperature Sensor',
+                category: 'sensors',
+                price: 120,
+                quantity: 800,
+                vendor: 'GreenTech Components',
+                description: 'Accurate temperature and humidity sensors, bulk quantity available'
+            },
+            {
+                id: 4,
+                name: 'Raspberry Pi 3 Model B',
+                category: 'embedded',
+                price: 1200,
+                quantity: 150,
+                vendor: 'TechRecycle Pvt Ltd',
+                description: 'Refurbished Raspberry Pi boards with warranty'
+            },
+            {
+                id: 5,
+                name: 'LED Matrix Display 8x8',
+                category: 'components',
+                price: 85,
+                quantity: 1000,
+                vendor: 'ElectroReuse Solutions',
+                description: 'Working LED matrices from recycled electronic devices'
+            },
+            {
+                id: 6,
+                name: '16GB MicroSD Card',
+                category: 'sd-cards',
+                price: 95,
+                quantity: 750,
+                vendor: 'GreenTech Components',
+                description: 'Tested microSD cards, perfect for embedded projects'
+            }
+        ];
+        let vendors = [];
+        let customers = [];
+        let orders = [];
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            renderProducts();
+            updateCartBadge();
+        });
+
+        // Auth Functions
+        function openAuthModal(type) {
+            document.getElementById('authModal').classList.add('active');
+            if (type === 'register') {
+                switchToRegister();
+            } else {
+                switchToLogin();
+            }
+        }
+
+        function closeAuthModal() {
+            document.getElementById('authModal').classList.remove('active');
+        }
+
+        function switchToLogin() {
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('modalTitle').textContent = 'Login';
+        }
+
+        function switchToRegister() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+            document.getElementById('modalTitle').textContent = 'Register';
+        }
+
+        function selectRole(role) {
+            selectedLoginRole = role;
+            document.querySelectorAll('#loginForm .role-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.role === role) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        function selectRegisterRole(role) {
+            selectedRegisterRole = role;
+            document.querySelectorAll('#registerForm .role-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.role === role) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Show/hide vendor fields
+            const vendorFields = document.getElementById('vendorFields');
+            if (role === 'vendor') {
+                vendorFields.style.display = 'block';
+                // Make vendor fields required
+                document.getElementById('businessName').required = true;
+                document.getElementById('businessAddress').required = true;
+                document.getElementById('aadhaarNumber').required = true;
+            } else {
+                vendorFields.style.display = 'none';
+                document.getElementById('businessName').required = false;
+                document.getElementById('businessAddress').required = false;
+                document.getElementById('aadhaarNumber').required = false;
+            }
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            
+            const phone = document.getElementById('loginPhone').value;
+            const password = document.getElementById('loginPassword').value;
+
+            // Demo login - In production, verify against backend
+            if (selectedLoginRole === 'admin' && phone === 'admin' && password === 'admin123') {
+                currentUser = {
+                    role: 'admin',
+                    name: 'Admin User',
+                    email: 'admin@reusablemarketspace.com'
+                };
+                showDashboard('admin');
+            } else if (selectedLoginRole === 'vendor') {
+                // Demo vendor login
+                currentUser = {
+                    role: 'vendor',
+                    name: 'Demo Vendor',
+                    email: phone,
+                    kycStatus: 'verified',
+                    businessName: 'TechRecycle Pvt Ltd'
+                };
+                showDashboard('vendor');
+            } else {
+                // Demo customer login
+                currentUser = {
+                    role: 'customer',
+                    name: 'Demo Customer',
+                    phone: phone,
+                    email: phone
+                };
+                showDashboard('customer');
+            }
+
+            closeAuthModal();
+        }
+
+        function handleRegister(event) {
+            event.preventDefault();
+
+            const userData = {
+                name: document.getElementById('regName').value,
+                phone: document.getElementById('regPhone').value,
+                email: document.getElementById('regEmail').value,
+                password: document.getElementById('regPassword').value,
+                role: selectedRegisterRole
+            };
+
+            if (selectedRegisterRole === 'vendor') {
+                userData.businessName = document.getElementById('businessName').value;
+                userData.gstNumber = document.getElementById('gstNumber').value;
+                userData.businessAddress = document.getElementById('businessAddress').value;
+                userData.aadhaarNumber = document.getElementById('aadhaarNumber').value;
+                userData.kycStatus = 'pending';
+
+                // Simulate DigiLocker e-KYC process
+                alert('✅ Registration successful!\n\n📱 An OTP has been sent to your Aadhaar-linked mobile number.\n\nPlease verify to complete e-KYC through DigiLocker.\n\nYour account will be activated after admin approval.');
+                
+                vendors.push(userData);
+            } else {
+                customers.push(userData);
+                alert('✅ Registration successful! You can now login.');
+            }
+
+            closeAuthModal();
+            switchToLogin();
+        }
+
+        function showDashboard(role) {
+            // Hide all dashboards
+            document.querySelectorAll('.dashboard').forEach(dash => dash.classList.remove('active'));
+
+            // Update navigation
+            const navLinks = document.querySelector('.nav-links');
+            navLinks.innerHTML = `
+                <button onclick="showHome()">Home</button>
+                <button>👤 ${currentUser.name}</button>
+                <button onclick="logout()" class="btn-primary">Logout</button>
+            `;
+
+            if (role === 'admin') {
+                document.getElementById('adminDashboard').classList.add('active');
+                updateAdminStats();
+            } else if (role === 'vendor') {
+                document.getElementById('vendorDashboard').classList.add('active');
+                updateVendorDashboard();
+            } else {
+                document.getElementById('customerDashboard').classList.add('active');
+                updateCustomerDashboard();
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            cart = [];
+            showHome();
+            
+            const navLinks = document.querySelector('.nav-links');
+            navLinks.innerHTML = `
+                <button onclick="showHome()">Home</button>
+                <button onclick="openAuthModal('login')">Login</button>
+                <button onclick="openAuthModal('register')" class="btn-primary">Register</button>
+            `;
+        }
+
+        function showHome() {
+            document.querySelectorAll('.dashboard').forEach(dash => dash.classList.remove('active'));
+            document.getElementById('homeSection').classList.add('active');
+            renderProducts();
+        }
+
+        // Product Functions
+        function renderProducts() {
+            const grid = document.getElementById('productsGrid');
+            grid.innerHTML = products.map(product => `
+                <div class="product-card">
+                    <div class="product-image">${getCategoryIcon(product.category)}</div>
+                    <div class="product-info">
+                        <h3>${product.name}</h3>
+                        <div class="product-price">₹${product.price}</div>
+                        <div class="product-quantity">In Stock: ${product.quantity} units</div>
+                        <div class="product-vendor">📦 ${product.vendor}</div>
+                        <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 1rem;">${product.description}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderCustomerProducts() {
+            const grid = document.getElementById('customerProductsGrid');
+            grid.innerHTML = products.map(product => `
+                <div class="product-card">
+                    <div class="product-image">${getCategoryIcon(product.category)}</div>
+                    <div class="product-info">
+                        <h3>${product.name}</h3>
+                        <div class="product-price">₹${product.price}</div>
+                        <div class="product-quantity">In Stock: ${product.quantity} units</div>
+                        <div class="product-vendor">📦 ${product.vendor}</div>
+                        <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 1rem;">${product.description}</p>
+                        <div class="product-actions">
+                            <button class="btn-add-cart" onclick="addToCart(${product.id})">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getCategoryIcon(category) {
+            const icons = {
+                'sd-cards': '💾',
+                'embedded': '🔧',
+                'sensors': '📡',
+                'components': '⚡'
+            };
+            return icons[category] || '📦';
+        }
+
+        function filterProducts() {
+            const searchValue = (document.getElementById('searchInput')?.value || document.getElementById('customerSearchInput')?.value || '').toLowerCase();
+            const categoryValue = (document.getElementById('categoryFilter')?.value || document.getElementById('customerCategoryFilter')?.value || 'all');
+
+            const filtered = products.filter(product => {
+                const matchesSearch = product.name.toLowerCase().includes(searchValue) || 
+                                     product.description.toLowerCase().includes(searchValue);
+                const matchesCategory = categoryValue === 'all' || product.category === categoryValue;
+                return matchesSearch && matchesCategory;
+            });
+
+            const grid = currentUser?.role === 'customer' ? 
+                        document.getElementById('customerProductsGrid') : 
+                        document.getElementById('productsGrid');
+            
+            if (currentUser?.role === 'customer') {
+                grid.innerHTML = filtered.map(product => `
+                    <div class="product-card">
+                        <div class="product-image">${getCategoryIcon(product.category)}</div>
+                        <div class="product-info">
+                            <h3>${product.name}</h3>
+                            <div class="product-price">₹${product.price}</div>
+                            <div class="product-quantity">In Stock: ${product.quantity} units</div>
+                            <div class="product-vendor">📦 ${product.vendor}</div>
+                            <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 1rem;">${product.description}</p>
+                            <div class="product-actions">
+                                <button class="btn-add-cart" onclick="addToCart(${product.id})">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                grid.innerHTML = filtered.map(product => `
+                    <div class="product-card">
+                        <div class="product-image">${getCategoryIcon(product.category)}</div>
+                        <div class="product-info">
+                            <h3>${product.name}</h3>
+                            <div class="product-price">₹${product.price}</div>
+                            <div class="product-quantity">In Stock: ${product.quantity} units</div>
+                            <div class="product-vendor">📦 ${product.vendor}</div>
+                            <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 1rem;">${product.description}</p>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Cart Functions
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            const existingItem = cart.find(item => item.id === productId);
+
+            if (existingItem) {
+                if (existingItem.quantity < product.quantity) {
+                    existingItem.quantity++;
+                } else {
+                    alert('Maximum available quantity reached!');
+                    return;
+                }
+            } else {
+                cart.push({
+                    ...product,
+                    cartQuantity: 1
+                });
+            }
+
+            updateCartBadge();
+            alert('✅ Product added to cart!');
+        }
+
+        function updateCartBadge() {
+            const badge = document.getElementById('cartButton');
+            if (badge) {
+                const totalItems = cart.reduce((sum, item) => sum + (item.cartQuantity || 1), 0);
+                badge.setAttribute('data-count', totalItems);
+            }
+        }
+
+        function showCart() {
+            document.querySelectorAll('.dashboard').forEach(dash => dash.classList.remove('active'));
+            document.getElementById('cartSection').classList.add('active');
+            renderCart();
+        }
+
+        function renderCart() {
+            const cartItemsDiv = document.getElementById('cartItems');
+            
+            if (cart.length === 0) {
+                cartItemsDiv.innerHTML = '<div class="alert alert-info">Your cart is empty. Start shopping!</div>';
+                updateCartSummary();
+                return;
+            }
+
+            cartItemsDiv.innerHTML = cart.map((item, index) => `
+                <div class="cart-item">
+                    <div class="cart-item-info">
+                        <h4>${item.name}</h4>
+                        <p>₹${item.price} × ${item.cartQuantity || 1} = ₹${item.price * (item.cartQuantity || 1)}</p>
+                    </div>
+                    <div class="cart-item-actions">
+                        <div class="quantity-control">
+                            <button onclick="updateCartQuantity(${index}, -1)">-</button>
+                            <span>${item.cartQuantity || 1}</span>
+                            <button onclick="updateCartQuantity(${index}, 1)">+</button>
+                        </div>
+                        <button onclick="removeFromCart(${index})" style="color: #ef4444; border: none; background: none; cursor: pointer; font-size: 1.2rem;">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+
+            updateCartSummary();
+        }
+
+        function updateCartQuantity(index, change) {
+            const item = cart[index];
+            const newQuantity = (item.cartQuantity || 1) + change;
+
+            if (newQuantity < 1) {
+                removeFromCart(index);
+                return;
+            }
+
+            if (newQuantity > item.quantity) {
+                alert('Maximum available quantity reached!');
+                return;
+            }
+
+            item.cartQuantity = newQuantity;
+            renderCart();
+            updateCartBadge();
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            renderCart();
+            updateCartBadge();
+        }
+
+        function updateCartSummary() {
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * (item.cartQuantity || 1)), 0);
+            const tax = subtotal * 0.18;
+            const total = subtotal + tax;
+
+            document.getElementById('cartSubtotal').textContent = `₹${subtotal.toFixed(2)}`;
+            document.getElementById('cartTax').textContent = `₹${tax.toFixed(2)}`;
+            document.getElementById('cartTotal').textContent = `₹${total.toFixed(2)}`;
+        }
+
+        function backToShopping() {
+            showDashboard('customer');
+        }
+
+        function proceedToCheckout() {
+            if (cart.length === 0) {
+                alert('Your cart is empty!');
+                return;
+            }
+
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * (item.cartQuantity || 1)), 0);
+            const tax = subtotal * 0.18;
+            const total = subtotal + tax;
+
+            document.getElementById('paymentSubtotal').textContent = `₹${subtotal.toFixed(2)}`;
+            document.getElementById('paymentTax').textContent = `₹${tax.toFixed(2)}`;
+            document.getElementById('paymentTotal').textContent = `₹${total.toFixed(2)}`;
+
+            document.getElementById('paymentModal').classList.add('active');
+        }
+
+        function closePaymentModal() {
+            document.getElementById('paymentModal').classList.remove('active');
+        }
+
+        function selectPaymentMethod(element) {
+            document.querySelectorAll('.payment-method').forEach(method => {
+                method.classList.remove('selected');
+            });
+            element.classList.add('selected');
+        }
+
+        function processPayment() {
+            // Simulate payment processing
+            alert('🔄 Processing payment through Razorpay...\n\n✅ Payment Successful!\n\nOrder ID: ORD' + Date.now() + '\n\nThank you for your purchase!');
+            
+            // Create order
+            const order = {
+                id: 'ORD' + Date.now(),
+                customer: currentUser.name,
+                items: [...cart],
+                total: parseFloat(document.getElementById('paymentTotal').textContent.replace('₹', '')),
+                date: new Date().toLocaleDateString(),
+                status: 'Processing'
+            };
+            orders.push(order);
+
+            // Clear cart
+            cart = [];
+            updateCartBadge();
+            
+            closePaymentModal();
+            showDashboard('customer');
+        }
+
+        // Vendor Functions
+        function updateVendorDashboard() {
+            document.getElementById('vendorWelcome').textContent = `Welcome, ${currentUser.businessName || currentUser.name}`;
+            
+            const kycStatusDiv = document.getElementById('vendorKycStatus');
+            if (currentUser.kycStatus === 'verified') {
+                kycStatusDiv.innerHTML = '<div class="kyc-status kyc-verified">✓ e-KYC Verified via DigiLocker</div>';
+            } else {
+                kycStatusDiv.innerHTML = '<div class="kyc-status kyc-pending">⏳ e-KYC Pending - Admin Approval Required</div>';
+            }
+
+            const vendorProducts = products.filter(p => p.vendor === (currentUser.businessName || 'Demo Vendor'));
+            document.getElementById('vendorProductCount').textContent = vendorProducts.length;
+            
+            const vendorOrders = orders.filter(o => o.items.some(item => item.vendor === (currentUser.businessName || 'Demo Vendor')));
+            document.getElementById('vendorOrderCount').textContent = vendorOrders.length;
+            
+            const revenue = vendorOrders.reduce((sum, order) => sum + order.total, 0);
+            document.getElementById('vendorRevenue').textContent = revenue.toFixed(2);
+
+            renderVendorProducts();
+        }
+
+        function renderVendorProducts() {
+            const grid = document.getElementById('vendorProductsGrid');
+            const vendorProducts = products.filter(p => p.vendor === (currentUser.businessName || 'TechRecycle Pvt Ltd'));
+            
+            grid.innerHTML = vendorProducts.map(product => `
+                <div class="product-card">
+                    <div class="product-image">${getCategoryIcon(product.category)}</div>
+                    <div class="product-info">
+                        <h3>${product.name}</h3>
+                        <div class="product-price">₹${product.price}</div>
+                        <div class="product-quantity">In Stock: ${product.quantity} units</div>
+                        <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 1rem;">${product.description}</p>
+                        <button onclick="editProduct(${product.id})" class="btn-add-cart">Edit Product</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openAddProductModal() {
+            if (currentUser.kycStatus !== 'verified') {
+                alert('⚠️ Please complete e-KYC verification before adding products.');
+                return;
+            }
+            document.getElementById('addProductModal').classList.add('active');
+        }
+
+        function closeAddProductModal() {
+            document.getElementById('addProductModal').classList.remove('active');
+        }
+
+        function handleAddProduct(event) {
+            event.preventDefault();
+
+            const newProduct = {
+                id: products.length + 1,
+                name: document.getElementById('productName').value,
+                category: document.getElementById('productCategory').value,
+                price: parseFloat(document.getElementById('productPrice').value),
+                quantity: parseInt(document.getElementById('productQuantity').value),
+                vendor: currentUser.businessName || currentUser.name,
+                description: document.getElementById('productDescription').value
+            };
+
+            products.push(newProduct);
+            alert('✅ Product added successfully!');
+            
+            closeAddProductModal();
+            updateVendorDashboard();
+            event.target.reset();
+        }
+
+        function editProduct(productId) {
+            alert('Edit functionality - would open modal with product details to edit');
+        }
+
+        // Admin Functions
+        function updateAdminStats() {
+            document.getElementById('adminVendorCount').textContent = vendors.length + 3; // +3 for demo vendors
+            document.getElementById('adminCustomerCount').textContent = customers.length + 15; // +15 for demo customers
+            document.getElementById('adminProductCount').textContent = products.length;
+            document.getElementById('adminOrderCount').textContent = orders.length + 47; // +47 for demo orders
+        }
+
+        function showAdminSection(section) {
+            const contentSection = document.getElementById('adminContentSection');
+            
+            if (section === 'vendors') {
+                contentSection.innerHTML = `
+                    <div class="products-header">
+                        <h2>Vendor Management</h2>
+                    </div>
+                    <table class="users-table">
+                        <thead>
+                            <tr>
+                                <th>Business Name</th>
+                                <th>Contact</th>
+                                <th>GST Number</th>
+                                <th>e-KYC Status</th>
+                                <th>Products</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>TechRecycle Pvt Ltd</td>
+                                <td>vendor1@example.com</td>
+                                <td>27AABCU9603R1ZM</td>
+                                <td><span class="status-badge status-approved">Verified</span></td>
+                                <td>3</td>
+                                <td><button class="btn-secondary" style="padding: 0.5rem 1rem; width: auto;">Manage</button></td>
+                            </tr>
+                            <tr>
+                                <td>ElectroReuse Solutions</td>
+                                <td>vendor2@example.com</td>
+                                <td>29AABCU9603R1ZX</td>
+                                <td><span class="status-badge status-approved">Verified</span></td>
+                                <td>2</td>
+                                <td><button class="btn-secondary" style="padding: 0.5rem 1rem; width: auto;">Manage</button></td>
+                            </tr>
+                            <tr>
+                                <td>GreenTech Components</td>
+                                <td>vendor3@example.com</td>
+                                <td>-</td>
+                                <td><span class="status-badge status-pending">Pending Review</span></td>
+                                <td>1</td>
+                                <td><button class="btn-primary" style="padding: 0.5rem 1rem; width: auto;">Approve KYC</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                `;
+            } else if (section === 'customers') {
+                contentSection.innerHTML = `
+                    <div class="products-header">
+                        <h2>Customer Management</h2>
+                    </div>
+                    <table class="users-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Contact</th>
+                                <th>Total Orders</th>
+                                <th>Total Spent</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Rajesh Kumar</td>
+                                <td>rajesh@example.com</td>
+                                <td>12</td>
+                                <td>₹45,230</td>
+                                <td><span class="status-badge status-approved">Active</span></td>
+                            </tr>
+                            <tr>
+                                <td>Priya Sharma</td>
+                                <td>priya@example.com</td>
+                                <td>8</td>
+                                <td>₹28,500</td>
+                                <td><span class="status-badge status-approved">Active</span></td>
+                            </tr>
+                            <tr>
+                                <td>Amit Patel</td>
+                                <td>amit@example.com</td>
+                                <td>5</td>
+                                <td>₹18,750</td>
+                                <td><span class="status-badge status-approved">Active</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                `;
+            } else if (section === 'products') {
+                contentSection.innerHTML = `
+                    <div class="products-header">
+                        <h2>Product Management</h2>
+                    </div>
+                    <div class="products-grid">
+                        ${products.map(product => `
+                            <div class="product-card">
+                                <div class="product-image">${getCategoryIcon(product.category)}</div>
+                                <div class="product-info">
+                                    <h3>${product.name}</h3>
+                                    <div class="product-price">₹${product.price}</div>
+                                    <div class="product-quantity">Stock: ${product.quantity}</div>
+                                    <div class="product-vendor">📦 ${product.vendor}</div>
+                                    <button class="btn-secondary" style="margin-top: 0.5rem; width: 100%;">Manage</button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } else if (section === 'orders') {
+                contentSection.innerHTML = `
+                    <div class="products-header">
+                        <h2>Order Management</h2>
+                    </div>
+                    <table class="users-table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Customer</th>
+                                <th>Amount</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>ORD1730987234</td>
+                                <td>Rajesh Kumar</td>
+                                <td>₹5,450</td>
+                                <td>05 Nov 2025</td>
+                                <td><span class="status-badge status-approved">Delivered</span></td>
+                                <td><button class="btn-secondary" style="padding: 0.5rem 1rem; width: auto;">View</button></td>
+                            </tr>
+                            <tr>
+                                <td>ORD1730987123</td>
+                                <td>Priya Sharma</td>
+                                <td>₹3,200</td>
+                                <td>04 Nov 2025</td>
+                                <td><span class="status-badge status-pending">Processing</span></td>
+                                <td><button class="btn-secondary" style="padding: 0.5rem 1rem; width: auto;">View</button></td>
+                            </tr>
+                            <tr>
+                                <td>ORD1730986987</td>
+                                <td>Amit Patel</td>
+                                <td>₹8,900</td>
+                                <td>03 Nov 2025</td>
+                                <td><span class="status-badge status-approved">Shipped</span></td>
+                                <td><button class="btn-secondary" style="padding: 0.5rem 1rem; width: auto;">View</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                `;
+            }
+        }
+
+        // Customer Functions
+        function updateCustomerDashboard() {
+            document.getElementById('customerWelcome').textContent = `Welcome back, ${currentUser.name}!`;
+            renderCustomerProducts();
+        }
+    </script>
+</body>
+</html>
+
